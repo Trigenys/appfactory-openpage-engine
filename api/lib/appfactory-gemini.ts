@@ -1,4 +1,4 @@
-const DEFAULT_MODELS = ['gemini-2.5-flash', 'gemini-3-flash-preview']
+const DEFAULT_MODELS = ['gemini-3.6-flash']
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 const REQUEST_TIMEOUT_MS = 30_000
 
