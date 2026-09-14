@@ -1,1 +1,0 @@
-This file intentionally exists only to force the AppFactory export branch to include the runtime alias declaration alongside the Vercel function entrypoint. It can be removed after production verification.
