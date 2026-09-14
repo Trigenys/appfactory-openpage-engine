@@ -4,6 +4,7 @@ import {
   AppFactoryGeminiError,
   generateAppFactorySiteConfig,
 } from './lib/appfactory-gemini.js'
+import { enrichSiteConfigWithPexels } from './lib/appfactory-pexels.js'
 
 export const config = {
   maxDuration: 60,
@@ -29,9 +30,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const config = await generateAppFactorySiteConfig(prompt)
+    const generatedConfig = await generateAppFactorySiteConfig(prompt)
+    const configWithMedia = await enrichSiteConfigWithPexels(generatedConfig, prompt)
     res.setHeader('Cache-Control', 'no-store')
-    return res.status(200).json(config)
+    return res.status(200).json(configWithMedia)
   } catch (error) {
     if (error instanceof AppFactoryGeminiError) {
       return res.status(502).json({
