@@ -5,6 +5,7 @@ import { register } from 'node:module'
 import type { SiteConfig } from '../src/blocks/types.js'
 import '../src/lib/theme-presets.js'
 import { requireAppFactoryToken } from './lib/appfactory-auth.js'
+import { normalizeGeneratedSiteConfig } from './lib/appfactory-export-normalize.js'
 
 register(new URL('./lib/appfactory-alias-loader.mjs', import.meta.url), import.meta.url)
 
@@ -29,13 +30,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!requireAppFactoryToken(req, res)) return
 
   const body = isObject(req.body) ? req.body : {}
-  const config = body.config
+  const normalizedConfig = normalizeGeneratedSiteConfig(body.config)
 
-  if (!validSiteConfig(config)) {
+  if (!validSiteConfig(normalizedConfig)) {
     return res.status(400).json({ error: 'config must be a valid OpenPage SiteConfig' })
   }
 
-  if (JSON.stringify(config).length > 1_000_000) {
+  if (JSON.stringify(normalizedConfig).length > 1_000_000) {
     return res.status(413).json({ error: 'SiteConfig is too large to export' })
   }
 
@@ -44,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { exportSiteToHTML } = await exporterPromise
     const settings = {
-      siteName: typeof rawSettings.siteName === 'string' ? rawSettings.siteName : config.name,
+      siteName: typeof rawSettings.siteName === 'string' ? rawSettings.siteName : normalizedConfig.name,
       siteDescription: typeof rawSettings.siteDescription === 'string' ? rawSettings.siteDescription : undefined,
       language: typeof rawSettings.language === 'string' ? rawSettings.language : undefined,
       seoTitle: typeof rawSettings.seoTitle === 'string' ? rawSettings.seoTitle : undefined,
@@ -53,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ogImageUrl: typeof rawSettings.ogImageUrl === 'string' ? rawSettings.ogImageUrl : undefined
     }
 
-    const html = exportSiteToHTML(config, { settings })
+    const html = exportSiteToHTML(normalizedConfig, { settings })
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Cache-Control', 'no-store')
     return res.status(200).send(html)
