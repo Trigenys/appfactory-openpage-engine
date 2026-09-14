@@ -38,8 +38,17 @@ function isFrench(prompt: string): boolean {
   return language.startsWith('fr') || language.includes('french') || language.includes('français')
 }
 
+function promptContext(prompt: string): string {
+  return `${promptValue(prompt, 'Business brief:') || ''} ${promptValue(prompt, 'Target audience:') || ''} ${promptValue(prompt, 'Design recipe:') || ''}`.toLowerCase()
+}
+
+function isSoftwareProduct(prompt: string): boolean {
+  const context = promptContext(prompt)
+  return /(software|saas|startup|technology|technologie|tech|digital|numérique|application|appli|logiciel|windows|winget|desktop|pc\b|assistant windows)/i.test(context)
+}
+
 function pexelsQuery(prompt: string): string {
-  const context = `${promptValue(prompt, 'Business brief:') || ''} ${promptValue(prompt, 'Target audience:') || ''}`.toLowerCase()
+  const context = promptContext(prompt)
 
   if (/(h[oô]tel|hotel|boutique hotel|resort|chambre|room|stay|hospitality|h[eé]bergement)/i.test(context)) {
     return 'luxury boutique hotel interior room travel'
@@ -67,9 +76,6 @@ function pexelsQuery(prompt: string): string {
   }
   if (/(creative|design|agency|agence|studio|portfolio)/i.test(context)) {
     return 'creative design studio modern workspace'
-  }
-  if (/(software|saas|startup|technology|technologie|tech|digital|numérique)/i.test(context)) {
-    return 'modern technology startup office team'
   }
 
   return 'premium business lifestyle modern interior'
@@ -119,6 +125,11 @@ export async function enrichSiteConfigWithPexels(rawConfig: unknown, prompt: str
 
   const config = rawConfig as SiteConfigLike
   if (!Array.isArray(config.blocks)) return rawConfig
+
+  if (isSoftwareProduct(prompt)) {
+    console.info('[appfactory-pexels] skipping stock-photo enrichment for software/SaaS product')
+    return rawConfig
+  }
 
   const photos = await searchPexels(prompt)
   if (photos.length === 0) return rawConfig
