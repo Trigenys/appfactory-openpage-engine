@@ -1,3 +1,5 @@
+/// <reference path="./lib/openpage-runtime-aliases.d.ts" />
+
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { register } from 'node:module'
 import type { SiteConfig } from '../src/blocks/types.js'
