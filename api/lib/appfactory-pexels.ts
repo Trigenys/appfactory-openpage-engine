@@ -123,7 +123,7 @@ export async function enrichSiteConfigWithPexels(rawConfig: unknown, prompt: str
   const photos = await searchPexels(prompt)
   if (photos.length === 0) return rawConfig
 
-  const blocks = config.blocks.map((block) => ({
+  const blocks: SiteBlock[] = config.blocks.map((block): SiteBlock => ({
     ...block,
     props: { ...(block.props || {}) }
   }))
