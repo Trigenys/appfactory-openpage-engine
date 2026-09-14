@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import type { SiteConfig } from '../src/blocks/types'
-import { exportSiteToHTML, type ExportSiteSettings } from '../src/lib/export-html'
-import { requireAppFactoryToken } from './lib/appfactory-auth'
+import type { SiteConfig } from '../src/blocks/types.js'
+import { exportSiteToHTML, type ExportSiteSettings } from '../src/lib/export-html.js'
+import { requireAppFactoryToken } from './lib/appfactory-auth.js'
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
