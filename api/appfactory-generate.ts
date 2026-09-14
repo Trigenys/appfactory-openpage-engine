@@ -9,6 +9,13 @@ export const config = {
   maxDuration: 60,
 }
 
+// Prefer the newest stable Flash model when no explicit override is configured.
+// appfactory-gemini.ts already keeps gemini-3.6-flash as its fallback candidate,
+// so the effective default chain is: 3.8 Flash -> 3.6 Flash.
+if (!process.env.GEMINI_MODEL?.trim()) {
+  process.env.GEMINI_MODEL = 'gemini-3.8-flash'
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
